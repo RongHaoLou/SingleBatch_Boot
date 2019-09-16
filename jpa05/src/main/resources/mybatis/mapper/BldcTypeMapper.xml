@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.indusfo.spc.mapper.BldcTypeMapper" >
+  <resultMap id="BaseResultMap" type="BldcType" >
+    <id column="BLDCTYPE_ID" property="bldcTypeId" jdbcType="INTEGER" />
+    <result column="BLDCTYPE_NAME" property="bldcTypeName" jdbcType="VARCHAR" />
+    <result column="BLDCTYPE_PID" property="bldcTypePid" jdbcType="INTEGER" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="DATA_STATE" property="dataState" jdbcType="INTEGER" />
+  </resultMap>
+  <sql id="Base_Column_List" >
+    BLDCTYPE_ID, BLDCTYPE_NAME, BLDCTYPE_PID, REMARK, DATA_STATE
+  </sql>
+
+  <!--根据Id查询不良对策类-->
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.Integer" >
+    select 
+    <include refid="Base_Column_List" />
+    from T_B78_BLDCTYPE
+    where BLDCTYPE_ID = #{bldcTypeId,jdbcType=INTEGER} and  DATA_STATE != 2
+  </select>
+
+  <!--添加不良对策类-->
+  <insert id="insertBldcType" parameterType="BldcType" useGeneratedKeys="true" keyProperty="bldcTypeId" >
+    insert into T_B78_BLDCTYPE
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bldcTypeId != null" >
+        BLDCTYPE_ID,
+      </if>
+      <if test="bldcTypeName != null" >
+        BLDCTYPE_NAME,
+      </if>
+      <if test="bldcTypePid != null" >
+        BLDCTYPE_PID,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="dataState != null" >
+        DATA_STATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bldcTypeId != null" >
+        #{bldcTypeId,jdbcType=INTEGER},
+      </if>
+      <if test="bldcTypeName != null" >
+        #{bldcTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="bldcTypePid != null" >
+        #{bldcTypePid,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null" >
+        #{dataState,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <!--修改不良对策类-->
+  <update id="updateBldcType" parameterType="BldcType" >
+    update T_B78_BLDCTYPE
+    <set >
+      <if test="bldcTypeName != null" >
+        BLDCTYPE_NAME = #{bldcTypeName,jdbcType=VARCHAR},
+      </if>
+      <if test="bldcTypePid != null" >
+        BLDCTYPE_PID = #{bldcTypePid,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null" >
+        DATA_STATE = #{dataState,jdbcType=INTEGER},
+      </if>
+    </set>
+    where BLDCTYPE_ID = #{bldcTypeId,jdbcType=INTEGER}  and DATA_STATE != 2
+  </update>
+
+  <!--查询不良对策类名是否存在-->
+  <select id="selectBldcTypeName" parameterType="BldcType" resultType="int">
+    SELECT COUNT(*) FROM T_B78_BLDCTYPE WHERE
+    <if test="bldcTypeName != null">
+      BLDCTYPE_NAME = #{bldcTypeName} AND
+    </if>
+    <if test="bldcTypeId != null">
+      BLDCTYPE_ID != #{bldcTypeId} AND
+    </if>
+    DATA_STATE != 2
+  </select>
+
+  <!--查询所有不良对策类-->
+  <select id="AllBldcType" parameterType="BldcType" resultType="BldcType">
+    select * from T_B78_BLDCTYPE where
+    <if test="bldcTypeId != null">
+    BLDCTYPE_ID != #{bldcTypeId} and
+    </if>
+    <if test="bldcTypePid != null">
+      BLDCTYPE_PID = #{bldcTypePid} and
+    </if>
+    DATA_STATE != 2
+  </select>
+
+  <!--删除不良对策类  实际把状态改为2-->
+  <update id="delteBldcType">
+    UPDATE T_B78_BLDCTYPE SET DATA_STATE = 2
+    WHERE BLDCTYPE_ID IN (
+    <foreach collection="bldcTypeIds" separator="," item="id">
+      #{id}
+    </foreach>
+    )
+  </update>
+
+<!--查询子类ID-->
+  <select id="queryChild" resultType="integer">
+    SELECT BLDCTYPE_ID FROM
+    T_B78_BLDCTYPE
+    WHERE
+    DATA_STATE = 1
+    <if test="bldctypeId != null">
+      AND  BLDCTYPE_PID=#{bldctypeId}
+    </if>
+  </select>
+
+</mapper>

@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace表示命名空间 ，值必须为接口的名称（包括包名） -->
+<!-- 实现类没有，mybatis框架会生成接口的实现类 -->
+<mapper namespace="com.indusfo.spc.mapper.BlyytypeMapper">
+    <resultMap id="BaseResultMap" type="com.indusfo.spc.pojo.Blyytype" >
+        <id column="BLYYTYPE_ID" property="blyytypeId"></id>
+        <result column="BLYYTYPE_NAME" property="blyytypeName"></result>
+        <result column="BLYYTYPE_PID" property="blyytypePid"></result>
+        <result column="REMARK" property="remark"></result>
+        <result column="DATA_STATE" property="dataState"></result>
+    </resultMap>
+
+    <!-- 根据用户Id查询用户对应的菜单 -->
+    <select id="getAllBlyytype" resultMap="BaseResultMap">
+            select  <include refid="Base_Column_List"/> from T_B76_BLYYTYPE where DATA_STATE != 2
+        </select>
+    <!-- 分页语句 -->
+    <sql id="Base_Column_Limit" >
+        <if test="pagesize != null and pageindex !=null">
+            OFFSET #{lN} ROWS FETCH NEXT #{pagesize} ROWS ONLY
+        </if>
+  </sql>
+    <!--字段语句-->
+    <sql id="Base_Column_List" >
+    BLYYTYPE_ID, BLYYTYPE_NAME, BLYYTYPE_PID, REMARK, DATA_STATE
+  </sql>
+        <!--模糊查询语句-->
+    <sql id="Base_Column_select" >
+        <if test="blyytypeName != null">
+            AND BLYYTYPE_NAME LIKE '%${blyytypeName}%'
+        </if>
+        <if test="remark != null">
+            AND REMARK  LIKE '%${remark}%'
+        </if>
+        <if test="blyytypePid != null">
+            AND BLYYTYPE_PID  = #{blyytypePid}
+        </if>
+        <if test="blyytypeId != null">
+            AND BLYYTYPE_ID  = #{blyytypeId}
+        </if>
+  </sql>
+
+    <!-- 树语句 -->
+    <sql id="Base_Column_Dim" >
+        WHERE
+        DATA_STATE = 1
+        <if test="blyytypeId !=null">
+            AND BLYYTYPE_ID = #{blyytypeId}
+        </if>
+        <if test="dim!=null and dim !=''">
+            AND BLYYTYPE_NAME  LIKE concat (concat('%' ,#{ dim }), '%')
+        </if>
+    </sql>
+
+
+    <!-- 查询数据总条数 -->
+    <select id="countallBlyytype" resultType="INTEGER">
+		SELECT COUNT(1) FROM T_B76_BLYYTYPE WHERE DATA_STATE != 2
+	</select>
+
+    <!-- 多字段查询 -->
+    <select id="selectAllBlyytype" resultMap="BaseResultMap"  parameterType="com.indusfo.spc.pojo.Blyytype">
+		SELECT
+		<include refid="Base_Column_List"/>
+		 FROM T_B76_BLYYTYPE
+        WHERE DATA_STATE != 2
+        <if test="blyytypeName != null">
+            AND BLYYTYPE_NAME LIKE '%${blyytypeName}%'
+        </if>
+        <if test="remark != null">
+            AND REMARK  LIKE '%${remark}%'
+        </if>
+        <if test="blyytypePid != null">
+            AND BLYYTYPE_PID  = #{blyytypePid}
+        </if>
+        <if test="blyytypeId != null">
+            AND BLYYTYPE_ID  = #{blyytypeId}
+        </if>
+        ORDER BY BLYYTYPE_ID
+        <include refid="Base_Column_Limit"/>
+	</select>
+
+    <!-- 多字段总条数 -->
+    <select id="countBlyytype" resultType="INTEGER" parameterType="com.indusfo.spc.pojo.Blyytype">
+		SELECT COUNT(1) FROM T_B76_BLYYTYPE WHERE DATA_STATE != 2    <include refid="Base_Column_select"/>
+	</select>
+
+    <!--通过主键选择更新-->
+    <update id="updateByPrimaryKeySelective" parameterType="com.indusfo.spc.pojo.Blyytype" >
+        update T_B76_BLYYTYPE
+        <set >
+            <if test="blyytypeName != null" >
+                BLYYTYPE_NAME = #{blyytypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="blyytypePid != null" >
+                BLYYTYPE_PID = #{blyytypePid,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null" >
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="dataState != null" >
+                DATA_STATE = #{dataState,jdbcType=INTEGER},
+            </if>
+        </set>
+        where BLYYTYPE_ID = #{blyytypeId,jdbcType=INTEGER}
+    </update>
+    <!--选择性插入-->
+
+    <insert id="insertSelective" parameterType="com.indusfo.spc.pojo.Blyytype"  useGeneratedKeys="true" keyProperty="blyytypeId">
+        insert into T_B76_BLYYTYPE
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="blyytypeId != null" >
+                BLYYTYPE_ID,
+            </if>
+            <if test="blyytypeName != null" >
+                BLYYTYPE_NAME,
+            </if>
+            <if test="blyytypePid != null" >
+                BLYYTYPE_PID,
+            </if>
+            <if test="remark != null" >
+                REMARK,
+            </if>
+            <if test="dataState != null" >
+                DATA_STATE,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="blyytypeId != null" >
+                #{blyytypeId,jdbcType=INTEGER},
+            </if>
+            <if test="blyytypeName != null" >
+                #{blyytypeName,jdbcType=VARCHAR},
+            </if>
+            <if test="blyytypePid != null" >
+                #{blyytypePid,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null" >
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="dataState != null" >
+                #{dataState,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+
+    <!-- 删除/停用/启用 -->
+    <update id="deleteBlyytype">
+        UPDATE T_B76_BLYYTYPE SET DATA_STATE = #{lDataState}
+        WHERE BLYYTYPE_ID IN (
+        <foreach collection="deteBlyytype" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+    </update>
+
+    <!-- 校检数据不重复使用,根据不为null的字段查询未删除的数据条数 -->
+    <select id="countParamsNotRepeat" parameterType="com.indusfo.spc.pojo.Blyytype" resultType="INTEGER">
+        SELECT COUNT(1) FROM T_B76_BLYYTYPE
+        <where>
+            <if test="blyytypeId != null">
+                BLYYTYPE_ID != #{blyytypeId}
+            </if>
+            <if test="blyytypeName != null">
+                AND BLYYTYPE_NAME = #{blyytypeName}
+            </if>
+            AND DATA_STATE != 2
+        </where>
+    </select>
+
+    <!-- 树的查询 -->
+    <select id="lookBlyytype" parameterType="com.indusfo.spc.pojo.Blyytype"  resultMap="BaseResultMap" >
+        SELECT
+        DISTINCT
+        <include refid="Base_Column_List"/>
+        FROM T_B76_BLYYTYPE
+        WHERE
+        DATA_STATE = 1
+        <if test="blyytypeId !=null">
+            AND BLYYTYPE_ID != #{blyytypeId}
+        </if>
+        <if test="dim!=null and dim !=''">
+            AND BLYYTYPE_NAME  LIKE concat (concat('%' ,#{ dim }), '%')
+        </if>
+        ORDER BY BLYYTYPE_ID ASC
+        <include refid="Base_Column_Limit"/>
+
+    </select>
+    <!-- 判断重复数据 -->
+    <select id="tallys" parameterType="com.indusfo.spc.pojo.Blyytype"  resultType="Integer">
+        SELECT
+        DISTINCT
+        count (0)
+        FROM
+        T_B76_BLYYTYPE
+        <include refid="Base_Column_Dim"/>
+    </select>
+    <!-- 树的总数 -->
+    <select id="countByblyytypePid"  resultType="integer">
+        SELECT  COUNT(*) FROM
+        T_B76_BLYYTYPE
+        WHERE DATA_STATE != 2
+        <if test="blyytypePids !=null">
+            AND BLYYTYPE_PID IN
+            (
+            <foreach collection="blyytypePids" separator="," item="pid">
+                #{pid}
+            </foreach>
+            )
+        </if>
+    </select>
+</mapper>

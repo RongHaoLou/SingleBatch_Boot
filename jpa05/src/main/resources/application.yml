@@ -1,0 +1,28 @@
+
+
+spring:
+  datasource:
+    url: jdbc:mysql://192.168.10.202:3306/ieis-com?serverTimezone=GMT&useSSL=false&serverTimezone=UTC&characterEncoding=utf8
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: root
+    password: 123456
+    type: com.alibaba.druid.pool.DruidDataSource
+  jpa:
+    show-sql: true
+    hibernate:
+      ddl-auto: none
+
+server:
+  servlet:
+    context-path: /service
+
+logging:
+  level:
+    root: warn
+    com.indusfo.spc.mapper: DEBUG
+
+mybatis:
+  mapper-locations: classpath:mybatis/mapper/*.xml
+  type-aliases-package: com.indusfo.spc.pojo
+  configuration:
+    map-underscore-to-camel-case: true

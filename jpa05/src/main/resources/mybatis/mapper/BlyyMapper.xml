@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- namespace表示命名空间 ，值必须为接口的名称（包括包名） -->
+<!-- 实现类没有，mybatis框架会生成接口的实现类 -->
+<mapper namespace="com.indusfo.spc.mapper.BlyyMapper">
+    <resultMap id="BaseResultMap" type="com.indusfo.spc.pojo.Blyy" >
+        <id column="BLYY_ID" property="blyyId"></id>
+        <result column="BLYY_NAME" property="blyyName"></result>
+        <result column="BLYYTYPE_ID" property="blyytypeId"></result>
+        <result column="REMARK" property="remark"></result>
+        <result column="DATA_STATE" property="dataState"></result>
+        <result column="BLYYTYPE_NAME" property="blyytypeName"></result>
+    </resultMap>
+
+
+    <!-- 分页语句 -->
+    <sql id="Base_Column_Limit" >
+        ORDER BY BLYY_ID
+        <if test="pagesize != null and pageindex !=null">
+            LIMIT #{lN}, #{pagesize}
+        </if>
+    </sql>
+    <!--字段语句-->
+    <sql id="Base_Column_List" >
+    BLYY_ID, BLYY_NAME, BLYYTYPE_ID, REMARK, DATA_STATE,(select T_B76_BLYYTYPE.BLYYTYPE_NAME  from T_B76_BLYYTYPE where T_B76_BLYYTYPE.DATA_STATE!=2 and  T_B76_BLYYTYPE.BLYYTYPE_ID=T_B77_BLYY.BLYYTYPE_ID  ) as BLYYTYPE_NAME
+  </sql>
+
+    <!--where语句-->
+    <sql id="Base_Column_Where" >
+         FROM T_B77_BLYY
+        WHERE DATA_STATE != 2
+  </sql>
+    <!--模糊查询语句-->
+    <sql id="Base_Column_Select" >
+        <if test="blyyName != null">
+            AND BLYY_NAME LIKE '%${blyyName}%'
+        </if>
+        <if test="remark != null">
+            AND REMARK  LIKE '%${remark}%'
+        </if>
+        <if test="blyytypeId != null">
+            AND BLYYTYPE_ID  = #{blyytypeId}
+        </if>
+
+        <if test="blyyId != null">
+            AND BLYY_ID  = #{blyyId}
+        </if>
+
+        <if test="dim != null">
+            AND  (BLYY_NAME LIKE '%${dim}%' or BLYY_ID LIKE '%${dim}%')
+        </if>
+    </sql>
+
+
+    <!-- 多字段查询 -->
+    <select id="selectAllBlyy" resultMap="BaseResultMap"  parameterType="com.indusfo.spc.pojo.Blyy">
+        SELECT
+        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_Where"/>
+        <include refid="Base_Column_Select"/>
+        <include refid="Base_Column_Limit"/>
+    </select>
+
+
+    <!-- 多字段查询 及其子类 -->
+    <select id="queryListBlyy" resultMap="BaseResultMap"  >
+        SELECT
+        <include refid="Base_Column_List"/>
+        <include refid="Base_Column_Where"/>
+        <if test="blyy.blyyName != null">
+            AND BLYY_NAME LIKE '%${blyy.blyyName}%'
+        </if>
+        <if test="blyy.remark != null">
+            AND REMARK  LIKE '%${blyy.remark}%'
+        </if>
+        <if test="childs !=null and childs.size() > 0">
+            AND  BLYYTYPE_ID IN (
+            <foreach collection="childs" separator="," item="id">
+                #{id}
+            </foreach>
+            )
+        </if>
+
+        <if test="blyy.blyyId != null">
+            AND BLYY_ID  = #{blyyId}
+        </if>
+
+        <if test="blyy.dim != null">
+            AND  (BLYY_NAME LIKE '%${blyy.dim}%' or BLYY_ID LIKE '%${blyy.dim}%')
+        </if>
+        ORDER BY BLYY_ID
+        <if test="blyy.pagesize != null and blyy.pageindex !=null">
+            LIMIT #{blyy.lN}, #{blyy.pagesize}
+        </if>
+    </select>
+
+
+    <!-- 多字段查询 及其子类 总数 -->
+    <select id="countListBlyy" resultType="INTEGER" >
+        SELECT
+       count(1)
+        <include refid="Base_Column_Where"/>
+        <if test="blyy.blyyName != null">
+            AND BLYY_NAME LIKE '%${blyy.blyyName}%'
+        </if>
+        <if test="blyy.remark != null">
+            AND REMARK  LIKE '%${blyy.remark}%'
+        </if>
+        <if test="childs !=null and childs.size() > 0">
+            AND  BLYYTYPE_ID IN (
+            <foreach collection="childs" separator="," item="id">
+                #{id}
+            </foreach>
+            )
+        </if>
+
+        <if test="blyy.blyyId != null">
+            AND BLYY_ID  = #{blyyId}
+        </if>
+
+        <if test="blyy.dim != null">
+            AND  (BLYY_NAME LIKE '%${blyy.dim}%' or BLYY_ID LIKE '%${blyy.dim}%')
+        </if>
+    </select>
+
+    <!-- 多字段总条数 -->
+    <select id="countBlyy" resultType="INTEGER" parameterType="com.indusfo.spc.pojo.Blyy">
+          SELECT COUNT(1)
+          <include refid="Base_Column_Where"/>
+         <include refid="Base_Column_Select"/>
+    </select>
+
+    <!--通过主键选择更新-->
+    <update id="updateByPrimaryKeySelective" parameterType="com.indusfo.spc.pojo.Blyy" >
+        update T_B77_BLYY
+        <set >
+            <if test="blyyName != null" >
+                BLYY_NAME = #{blyyName,jdbcType=VARCHAR},
+            </if>
+            <if test="blyytypeId != null" >
+                BLYYTYPE_ID = #{blyytypeId,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null" >
+                REMARK = #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="dataState != null" >
+                DATA_STATE = #{dataState,jdbcType=INTEGER},
+            </if>
+        </set>
+        where BLYY_ID = #{blyyId,jdbcType=INTEGER}
+    </update>
+    <!--选择性插入-->
+
+    <insert id="insertSelective" parameterType="com.indusfo.spc.pojo.Blyy" >
+        insert into T_B77_BLYY
+        <trim prefix="(" suffix=")" suffixOverrides="," >
+            <if test="blyyId != null" >
+                BLYY_ID,
+            </if>
+            <if test="blyyName != null" >
+                BLYY_NAME,
+            </if>
+            <if test="blyytypeId != null" >
+                BLYYTYPE_ID,
+            </if>
+            <if test="remark != null" >
+                REMARK,
+            </if>
+            <if test="dataState != null" >
+                DATA_STATE,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides="," >
+            <if test="blyyId != null" >
+                #{blyyId,jdbcType=INTEGER},
+            </if>
+            <if test="blyyName != null" >
+                #{blyyName,jdbcType=VARCHAR},
+            </if>
+            <if test="blyytypeId != null" >
+                #{blyytypeId,jdbcType=INTEGER},
+            </if>
+            <if test="remark != null" >
+                #{remark,jdbcType=VARCHAR},
+            </if>
+            <if test="dataState != null" >
+                #{dataState,jdbcType=INTEGER},
+            </if>
+        </trim>
+    </insert>
+
+
+    <!-- 删除/停用/启用 -->
+    <update id="deleteBlyy">
+        UPDATE T_B77_BLYY SET DATA_STATE = #{lDataState}
+        WHERE BLYY_ID IN (
+        <foreach collection="deteBlyy" separator="," item="id">
+            #{id}
+        </foreach>
+        )
+    </update>
+
+    <!-- 校检数据不重复使用,根据不为null的字段查询未删除的数据条数 -->
+    <select id="countParamsNotRepeat" parameterType="com.indusfo.spc.pojo.Blyy" resultType="INTEGER">
+        SELECT COUNT(1) FROM T_B77_BLYY
+        <where>
+            <if test="blyyId != null">
+                BLYY_ID != #{blyyId}
+            </if>
+            <if test="blyyName != null">
+                AND BLYY_NAME = #{blyyName}
+            </if>
+            AND DATA_STATE != 2
+        </where>
+    </select>
+    <!-- 级联删除 -->
+    <update id="deleteByblyytypePids" >
+        UPDATE T_B77_BLYY
+        SET DATA_STATE=2
+        WHERE
+        BLYYTYPE_ID IN
+        (
+          <foreach collection="blyytypePids" separator="," item="pid">
+              #{pid}
+          </foreach>
+        )
+    </update>
+</mapper>

@@ -1,0 +1,221 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.indusfo.spc.mapper.ClintMapper" >
+  <resultMap id="BaseResultMap" type="Clint" >
+    <id column="CLIENT_ID" property="clientId" jdbcType="INTEGER" />
+    <result column="CLIENT_CODE" property="clientCode" jdbcType="VARCHAR" />
+    <result column="CLIENT_TYPE" property="clientType" jdbcType="INTEGER" />
+    <result column="PRO_XIA" property="proXia" jdbcType="INTEGER" />
+    <result column="SCAN_TYPE" property="scanType" jdbcType="INTEGER" />
+    <result column="AUTOPRINT" property="autoprint" jdbcType="INTEGER" />
+    <result column="PRO_JUMP" property="proJump" jdbcType="INTEGER" />
+    <result column="RECODE_ERR" property="recodeErr" jdbcType="INTEGER" />
+    <result column="PABANG" property="pabang" jdbcType="INTEGER" />
+    <result column="BATCHNO_BEGIN" property="batchnoBegin" jdbcType="INTEGER" />
+    <result column="XIATIP" property="xiatip" jdbcType="INTEGER" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="DATA_STATE" property="dataState" jdbcType="INTEGER" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    CLIENT_ID, CLIENT_CODE, CLIENT_TYPE, PRO_XIA, SCAN_TYPE, AUTOPRINT, PRO_JUMP, RECODE_ERR, 
+    PABANG, BATCHNO_BEGIN, XIATIP, REMARK, DATA_STATE
+  </sql>
+
+  <!--分页查询客户端设置-->
+  <select id="selectAll" parameterType="ClintVO" resultType="ClintVO">
+    select * from T_B83_CLIENT left join T_B72_OFFLINE on T_B83_CLIENT.PRO_XIA = T_B72_OFFLINE.OFFLINE_ID and
+    T_B83_CLIENT.DATA_STATE != 2 and T_B72_OFFLINE.DATA_STATE = 1 where T_B83_CLIENT.DATA_STATE != 2 ORDER BY CLIENT_ID DESC
+    <if test="pagesize != null and pageindex !=null">
+      LIMIT #{lN}, #{pagesize}
+    </if>
+  </select>
+
+  <!--模糊查询-->
+  <select id="selectLikeClint" parameterType="ClintVO" resultType="ClintVO">
+    select * from T_B83_CLIENT left join T_B72_OFFLINE on
+    T_B83_CLIENT.PRO_XIA = T_B72_OFFLINE.OFFLINE_ID and
+    T_B83_CLIENT.DATA_STATE != 2 and T_B72_OFFLINE.DATA_STATE = 1
+    where T_B83_CLIENT.DATA_STATE != 2
+    <if test="dim != null">
+      and CLIENT_CODE LIKE '%${dim}%'
+    </if>
+    ORDER BY CLIENT_ID DESC
+    <if test="pagesize != null and pageindex !=null">
+      LIMIT #{lN}, #{pagesize}
+    </if>
+  </select>
+
+  <!--查询指定ID的客户端设置-->
+  <select id="selectByClientId" parameterType="ClintVO" resultType="ClintVO" >
+    select 
+    <include refid="Base_Column_List" />
+    from T_B83_CLIENT
+    where CLIENT_ID = #{clientId} and DATA_STATE != 2
+  </select>
+
+  <!--添加客户端设置-->
+  <insert id="insertClint" parameterType="ClintVO" >
+    insert into T_B83_CLIENT
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="clientId != null" >
+        CLIENT_ID,
+      </if>
+      <if test="clientCode != null" >
+        CLIENT_CODE,
+      </if>
+      <if test="clientType != null" >
+        CLIENT_TYPE,
+      </if>
+      <if test="proXia != null" >
+        PRO_XIA,
+      </if>
+      <if test="scanType != null" >
+        SCAN_TYPE,
+      </if>
+      <if test="autoprint != null" >
+        AUTOPRINT,
+      </if>
+      <if test="proJump != null" >
+        PRO_JUMP,
+      </if>
+      <if test="recodeErr != null" >
+        RECODE_ERR,
+      </if>
+      <if test="pabang != null" >
+        PABANG,
+      </if>
+      <if test="batchnoBegin != null" >
+        BATCHNO_BEGIN,
+      </if>
+      <if test="xiatip != null" >
+        XIATIP,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="dataState != null" >
+        DATA_STATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="clientId != null" >
+        #{clientId,jdbcType=INTEGER},
+      </if>
+      <if test="clientCode != null" >
+        #{clientCode,jdbcType=VARCHAR},
+      </if>
+      <if test="clientType != null" >
+        #{clientType,jdbcType=INTEGER},
+      </if>
+      <if test="proXia != null" >
+        #{proXia,jdbcType=INTEGER},
+      </if>
+      <if test="scanType != null" >
+        #{scanType,jdbcType=INTEGER},
+      </if>
+      <if test="autoprint != null" >
+        #{autoprint,jdbcType=INTEGER},
+      </if>
+      <if test="proJump != null" >
+        #{proJump,jdbcType=INTEGER},
+      </if>
+      <if test="recodeErr != null" >
+        #{recodeErr,jdbcType=INTEGER},
+      </if>
+      <if test="pabang != null" >
+        #{pabang,jdbcType=INTEGER},
+      </if>
+      <if test="batchnoBegin != null" >
+        #{batchnoBegin,jdbcType=INTEGER},
+      </if>
+      <if test="xiatip != null" >
+        #{xiatip,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null" >
+        #{dataState,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <!--修改客户端设置-->
+  <update id="updateClint" parameterType="ClintVO" >
+    update T_B83_CLIENT
+    <set >
+      <if test="clientCode != null" >
+        CLIENT_CODE = #{clientCode,jdbcType=VARCHAR},
+      </if>
+      <if test="clientType != null" >
+        CLIENT_TYPE = #{clientType,jdbcType=INTEGER},
+      </if>
+      <if test="proXia != null" >
+        PRO_XIA = #{proXia,jdbcType=INTEGER},
+      </if>
+      <if test="scanType != null" >
+        SCAN_TYPE = #{scanType,jdbcType=INTEGER},
+      </if>
+      <if test="autoprint != null" >
+        AUTOPRINT = #{autoprint,jdbcType=INTEGER},
+      </if>
+      <if test="proJump != null" >
+        PRO_JUMP = #{proJump,jdbcType=INTEGER},
+      </if>
+      <if test="recodeErr != null" >
+        RECODE_ERR = #{recodeErr,jdbcType=INTEGER},
+      </if>
+      <if test="pabang != null" >
+        PABANG = #{pabang,jdbcType=INTEGER},
+      </if>
+      <if test="batchnoBegin != null" >
+        BATCHNO_BEGIN = #{batchnoBegin,jdbcType=INTEGER},
+      </if>
+      <if test="xiatip != null" >
+        XIATIP = #{xiatip,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null" >
+        DATA_STATE = #{dataState,jdbcType=INTEGER},
+      </if>
+    </set>
+    where CLIENT_ID = #{clientId,jdbcType=INTEGER}
+  </update>
+
+  <!-- 查询验证客户端编号是否存在 -->
+  <select id="selectClint" parameterType="ClintVO" resultType="int">
+    SELECT COUNT(*) FROM T_B83_CLIENT WHERE
+    <if test="clientCode != null">
+      CLIENT_CODE = #{clientCode} AND
+    </if>
+    <if test="clientId != null">
+      CLIENT_ID != #{clientId} AND
+    </if>
+    DATA_STATE != 2
+  </select>
+
+  <!--1 启用  2 删除  3停用 客户端设置-->
+  <update id="delteClint">
+    UPDATE T_B83_CLIENT SET DATA_STATE = #{dataState}
+    WHERE CLIENT_ID IN (
+    <foreach collection="clintIds" separator="," item="id">
+      #{id}
+    </foreach>
+    )
+  </update>
+
+  <!--查询客户端设置总数-->
+  <select id="countClint" parameterType="ClintVO" resultType="int">
+    SELECT COUNT(*) FROM T_B83_CLIENT WHERE
+    <if test="clientId != null">
+      CLIENT_ID = #{clientId} and
+    </if>
+    <if test="dim != null">
+      CLIENT_CODE LIKE '%${dim}%' and
+    </if>
+    DATA_STATE != 2
+  </select>
+</mapper>

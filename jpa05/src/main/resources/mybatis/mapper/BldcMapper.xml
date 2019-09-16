@@ -1,0 +1,196 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.indusfo.spc.mapper.BldcMapper" >
+  <resultMap id="BaseResultMap" type="Bldc" >
+    <id column="BLDC_ID" property="bldcId" jdbcType="INTEGER" />
+    <result column="BLDC_NAME" property="bldcName" jdbcType="VARCHAR" />
+    <result column="BLDCTYPE_ID" property="bldctypeId" jdbcType="INTEGER" />
+    <result column="REMARK" property="remark" jdbcType="VARCHAR" />
+    <result column="DATA_STATE" property="dataState" jdbcType="INTEGER" />
+  </resultMap>
+
+  <sql id="Base_Column_List" >
+    BLDC_ID, BLDC_NAME, BLDCTYPE_ID, REMARK, DATA_STATE
+  </sql>
+
+  <!--分页查询不良对策-->
+  <select id="selectAll" parameterType="Bldc" resultType="Bldc">
+    select
+    A.BLDC_ID,
+    A.BLDC_NAME,
+    A.BLDCTYPE_ID,
+    B.BLDCTYPE_NAME,
+    A.REMARK,
+    A.DATA_STATE
+    from T_B79_BLDC A Left join T_B78_BLDCTYPE B on
+    A.BLDCTYPE_ID=B.BLDCTYPE_ID  where
+    <if test="dim != null">
+      ( A.BLDC_NAME LIKE '%${dim}%' or A.BLDC_ID LIKE '%${dim}%' ) and
+    </if>
+    <if test="bldctypeId != null">
+      A.BLDCTYPE_ID  = #{bldctypeId} and
+    </if>
+    A.DATA_STATE != 2 ORDER BY A.BLDC_ID
+    <if test="pagesize != null and pageindex !=null">
+      LIMIT #{lN}, #{pagesize}
+    </if>
+  </select>
+
+  <!--分页查询不良对策    及其子类-->
+  <select id="queryBldcByBldctypeId"  resultType="Bldc">
+    select
+    A.BLDC_ID,
+    A.BLDC_NAME,
+    A.BLDCTYPE_ID,
+    B.BLDCTYPE_NAME,
+    A.REMARK,
+    A.DATA_STATE
+    from T_B79_BLDC A Left join T_B78_BLDCTYPE B on
+    A.BLDCTYPE_ID=B.BLDCTYPE_ID  where
+    <if test="bldc.dim != null">
+      ( A.BLDC_NAME LIKE '%${bldc.dim}%' or A.BLDC_ID LIKE '%${bldc.dim}%' ) and
+    </if>
+    <if test="bldctypeIds !=null and bldctypeIds.size() > 0">
+      A.BLDCTYPE_ID IN (
+      <foreach collection="bldctypeIds" separator="," item="id">
+        #{id}
+      </foreach>
+      ) and
+    </if>
+    A.DATA_STATE != 2 ORDER BY A.BLDC_ID
+    <if test="bldc.pagesize != null and bldc.pageindex !=null">
+      LIMIT #{bldc.lN}, #{bldc.pagesize}
+    </if>
+  </select>
+
+  <!--查询指定ID的不良对策-->
+  <select id="selectByPrimaryKey" parameterType="Bldc" resultType="Bldc" >
+    select
+    <include refid="Base_Column_List" />
+    from T_B79_BLDC
+    where BLDC_ID = #{bldcId} and DATA_STATE != 2
+  </select>
+
+  <!--添加不良对策-->
+  <insert id="insertBldc" parameterType="Bldc" >
+    insert into T_B79_BLDC
+    <trim prefix="(" suffix=")" suffixOverrides="," >
+      <if test="bldcId != null" >
+        BLDC_ID,
+      </if>
+      <if test="bldcName != null" >
+        BLDC_NAME,
+      </if>
+      <if test="bldctypeId != null" >
+        BLDCTYPE_ID,
+      </if>
+      <if test="remark != null" >
+        REMARK,
+      </if>
+      <if test="dataState != null" >
+        DATA_STATE,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides="," >
+      <if test="bldcId != null" >
+        #{bldcId,jdbcType=INTEGER},
+      </if>
+      <if test="bldcName != null" >
+        #{bldcName,jdbcType=VARCHAR},
+      </if>
+      <if test="bldctypeId != null" >
+        #{bldctypeId,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null" >
+        #{dataState,jdbcType=INTEGER},
+      </if>
+    </trim>
+  </insert>
+
+  <!--修改不良对策-->
+  <update id="updateByPrimaryKeySelective" parameterType="Bldc" >
+    update T_B79_BLDC
+    <set >
+      <if test="bldcName != null" >
+        BLDC_NAME = #{bldcName,jdbcType=VARCHAR},
+      </if>
+      <if test="bldctypeId != null" >
+        BLDCTYPE_ID = #{bldctypeId,jdbcType=INTEGER},
+      </if>
+      <if test="remark != null" >
+        REMARK = #{remark,jdbcType=VARCHAR},
+      </if>
+      <if test="dataState != null" >
+        DATA_STATE = #{dataState,jdbcType=INTEGER},
+      </if>
+    </set>
+    where BLDC_ID = #{bldcId,jdbcType=INTEGER}
+  </update>
+
+  <!-- 查询验证不良对策是否存在 -->
+  <select id="selectBldc" parameterType="Bldc" resultType="int">
+    SELECT COUNT(*) FROM T_B79_BLDC WHERE
+    <if test="bldcName != null">
+      BLDC_NAME = #{bldcName} AND
+    </if>
+    <if test="bldcId != null">
+      BLDC_ID != #{bldcId} AND
+    </if>
+    DATA_STATE != 2
+  </select>
+
+  <!--1 启用  2 删除  3停用 不良对策-->
+  <update id="delteBldc">
+    UPDATE T_B79_BLDC SET DATA_STATE = #{dataState}
+    WHERE BLDC_ID IN (
+    <foreach collection="bldcIds" separator="," item="id">
+      #{id}
+    </foreach>
+    )
+  </update>
+
+  <!--查询不良对策总数-->
+  <select id="countBldc" parameterType="Bldc" resultType="int">
+    SELECT COUNT(*) FROM T_B79_BLDC WHERE
+    <if test="bldctypeId != null">
+      BLDCTYPE_ID  = #{bldctypeId} and
+    </if>
+    <if test="bldcId != null">
+      BLDC_ID = #{bldcId} and
+    </if>
+    <if test="dim != null">
+      ( BLDC_NAME LIKE '%${dim}%' or BLDC_ID LIKE '%${dim}%' ) and
+    </if>
+    DATA_STATE != 2
+  </select>
+
+  <!--查询不良对策总数   及其子类-->
+  <select id="countBldcByBldctypeId"  resultType="int">
+    SELECT COUNT(*) FROM T_B79_BLDC WHERE
+    <if test="bldc.dim != null">
+      ( BLDC_NAME LIKE '%${bldc.dim}%' or BLDC_ID LIKE '%${bldc.dim}%' ) and
+    </if>
+    <if test="bldctypeIds !=null and bldctypeIds.size() > 0">
+      BLDCTYPE_ID IN (
+      <foreach collection="bldctypeIds" separator="," item="id">
+        #{id}
+      </foreach>
+      ) and
+    </if>
+    DATA_STATE != 2
+  </select>
+
+
+<!--  结连删除-->
+  <update id="delteBldcByBldcTypeId" parameterType="Bldc">
+    UPDATE T_B79_BLDC SET DATA_STATE = 2
+    WHERE
+    <if test="bldctypeId != null">
+      BLDCTYPE_ID  = #{bldctypeId}
+    </if>
+  </update>
+
+</mapper>
